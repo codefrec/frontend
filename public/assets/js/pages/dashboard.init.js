@@ -2,51 +2,51 @@ setTimeout(function () {
   $("#subscribeModal").modal("show");
 }, 2e3);
 var options = {
-  chart: {
-    height: 360,
-    type: "bar",
-    stacked: !0,
-    toolbar: { show: !1 },
-    zoom: { enabled: !0 },
-  },
-  plotOptions: {
-    bar: { horizontal: !1, columnWidth: "15%", endingShape: "rounded" },
-  },
-  dataLabels: { enabled: !1 },
-  series: [
-    {
-      name: "Series A",
-      data: [44, 55, 41, 67, 22, 43, 36, 52, 24, 18, 36, 48],
+    chart: {
+      height: 360,
+      type: "bar",
+      stacked: !0,
+      toolbar: { show: !1 },
+      zoom: { enabled: !0 },
     },
-    {
-      name: "Series B",
-      data: [13, 23, 20, 8, 13, 27, 18, 22, 10, 16, 24, 22],
+    plotOptions: {
+      bar: { horizontal: !1, columnWidth: "15%", endingShape: "rounded" },
     },
-    {
-      name: "Series C",
-      data: [11, 17, 15, 15, 21, 14, 11, 18, 17, 12, 20, 18],
-    },
-  ],
-  xaxis: {
-    categories: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+    dataLabels: { enabled: !1 },
+    series: [
+      {
+        name: "Series A",
+        data: [44, 55, 41, 67, 22, 43, 36, 52, 24, 18, 36, 48],
+      },
+      {
+        name: "Series B",
+        data: [13, 23, 20, 8, 13, 27, 18, 22, 10, 16, 24, 22],
+      },
+      {
+        name: "Series C",
+        data: [11, 17, 15, 15, 21, 14, 11, 18, 17, 12, 20, 18],
+      },
     ],
+    xaxis: {
+      categories: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+    },
+    colors: ["#556ee6", "#f1b44c", "#34c38f"],
+    legend: { position: "bottom" },
+    fill: { opacity: 1 },
   },
-  colors: ["#556ee6", "#f1b44c", "#34c38f"],
-  legend: { position: "bottom" },
-  fill: { opacity: 1 },
-},
   chart = new ApexCharts(
     document.querySelector("#stacked-column-chart"),
     options
@@ -91,13 +91,30 @@ options = {
 // var urlencodeParser = bodyParser.urlencoded({ extended: false });
 // var axios = require("axios");
 async function readURL(input) {
+  function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == " ") {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
   var form = new FormData();
 
   form.append("profile", document.getElementById("file-input").files[0]);
 
   $.ajax({
     method: "POST",
-    url: "http://localhost:3000/api/v1/users/edit_profile?id=61fd6f12fbdac1c720f8b3e7",
+    url:
+      "http://localhost:3000/api/v1/users/edit_profile?id=" +
+      getCookie("email"),
     data: form,
     contentType: false,
     processData: false,
@@ -105,10 +122,9 @@ async function readURL(input) {
     success: function (res) {
       alert("Profile updated successfully");
       console.log(res);
-      document.cookie += "profile"
-      document.getElementById("img").src =
-        `http://localhost:3000/profiles/${res.profile}`;
-      // window.location.href = redirect;
+
+      document.cookie = "profile=" + res.profile;
+      window.location.href = "/";
     },
     error: function (error) {
       // $(".alert").css("display","block");

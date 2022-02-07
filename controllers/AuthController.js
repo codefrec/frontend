@@ -146,59 +146,47 @@ module.exports = function (app) {
   });
 
   app.post("/post-login", urlencodeParser, async function (req, res) {
-    //mock.onPost("/post-login").reply(async function (config) {
-    // const validUser = users.filter(
-    //   (usr) =>
-    //     usr.email === req.body.email && usr.password === req.body.password
-    // );
-    // if (validUser["length"] === 1) {
-    //   // Assign value in session
-    sess = req.session;
-    // sess.user = validUser;
     let body = {
       email: req.body.email,
       password: req.body.password,
     };
 
-    //   try {
-    //     let url = `http://localhost:3000/api/v1/users/login`;
-    //     const response = await fetch(url, {
-    //       method: "POST",
-    //       body: JSON.stringify(body),
-    //     });
-
-    //     const data = await response.json();
-    //     console.log(data);
-    //     res.send("fffffffffffff");
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // });
     try {
       const response = await axios.post(
         "http://localhost:3000/api/v1/users/login",
         body
       );
 
-      // localStorage.setItem("user", JSON.stringify(response.data));
+      res.cookie(
+        "name=" +
+          response.data.name +
+          ";expires =" +
+          Date.now() +
+          99999999999999999999
+      );
+      res.cookie(
+        "email=" +
+          response.data.email +
+          ";expires =" +
+          Date.now() +
+          99999999999999999999
+      );
 
-      // console.log(response.data);
-      res.cookie("user=" + JSON.stringify(response.data), expires = Date.now() + 99999999999999999999);
-      // console.log(response.data);
+      if (response.data.profile)
+        res.cookie(
+          "profile=" +
+            response.data.profile +
+            ";expires =" +
+            Date.now() +
+            99999999999999999999
+        );
+
       res.redirect("/");
-
-      //res.json("Hello");
     } catch (ex) {
-
       req.flash("error", "Incorrect email or password!");
       res.redirect("/login");
     }
   });
-  // } else {
-  //   req.flash("error", "Incorrect email or password!");
-  //   res.redirect("/login");
-  // }
-  //  });
 
   app.get("/forgot-password", function (req, res) {
     res.render("Auth/auth-forgot-password", {
@@ -208,14 +196,6 @@ module.exports = function (app) {
   });
 
   app.post("/post-forgot-password", urlencodeParser, async (req, res) => {
-    // const validUser = users.filter((usr) => usr.email === req.body.email);
-    // if (validUser["length"] === 1) {
-    //   req.flash("message", "We have e-mailed your password reset link!");
-    //   res.redirect("/forgot-password");
-    // } else {
-    //   req.flash("error", "Email Not Found !!");
-    //   res.redirect("/forgot-password");
-    // }
     let body = {
       email: req.body.email,
     };
@@ -230,6 +210,7 @@ module.exports = function (app) {
       //res.json("Hello");
     } catch (ex) {
       req.flash("error", "Email Not Found !!");
+      console.log(ex);
       res.redirect("/forgot-password");
     }
   });
@@ -258,17 +239,15 @@ module.exports = function (app) {
             "http://localhost:3000/api/v1/users/change_password",
             body
           );
-          console.log("hhhhhhhhhhhhhh");
 
           req.flash("message", response.data);
-          res.redirect("/forgot-password");
+          res.redirect("/login");
         } catch (ex) {
           req.flash("error", "Email Not Found !!");
+
           res.redirect("/forgot-password");
         }
       }
-
-      //res.json("Hello");
     } catch (ex) {
       req.flash("error", "Email Not Found !!");
       res.redirect("/forgot-password");
@@ -276,8 +255,11 @@ module.exports = function (app) {
   });
   app.get("/logout", function (req, res) {
     // Assign  null value in session
-    sess = req.session;
-    sess.user = null;
+    res.cookie("name=;" + "path='/';expires=" + new Date("01/01/1900"));
+
+    res.cookie("email=;" + "path='/';expires=" + new Date("01/01/1900"));
+
+    res.cookie("profile=;" + "path='/';expires=" + new Date("01/01/1900"));
 
     res.redirect("/login");
   });

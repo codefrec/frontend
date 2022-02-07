@@ -4,12 +4,12 @@ var urlencodeParser = bodyParser.urlencoded({ extended: false });
 
 module.exports = function (app) {
   function isUserAllowed(req, res, next) {
-    sess = req.session;
-    // if (sess.user) {
-    //       return next();
-    // }
-    // else { res.redirect('/login'); }
-    return next();
+    if (req.cookies.email && req.cookies.name) {
+      return next();
+    } else {
+      return res.redirect("/login");
+    }
+    // return next();
   }
 
   app.get("/dashboard-blog", isUserAllowed, function (req, res) {
